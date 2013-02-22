@@ -2,7 +2,10 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>Just Spaceships!</title>
+		<title>Galaxy</title>
+		<link rel="shortcut icon" href="/img/favicon.ico" />
+		<script src="js/jquery/jquery.min.js"></script>
+		<script src="js/jquery/jquery.cookie.js"></script>
 		<script src="js/oz.js"></script>
 		<script src="js/haf.js"></script>
 		<script src="js/game.js"></script>
@@ -20,13 +23,45 @@
 		<script src="js/background.js"></script>
 		<script src="js/map.js"></script>
 		<script src="js/explosion.js"></script>
+		<script src="js/preloadjs-0.2.0.js"></script>
 		<script src="js/weapon.js"></script>
 		<script src="js/weapon.projectile.js"></script>
 		<script src="js/label.js"></script>
 		<script src="js/score.js"></script>
 		<script src="js/setup.js"></script>
-		<script src="js/setup.local.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/style.css" />
+		<link rel="stylesheet" type="text/css" href="css/env.css" />
 	</head>
-	<body onload="new Setup()"></body>
+	<body>
+		<div id="Loading">
+	        <span class="percentage">0</span>%
+	    </div>
+	    <div id="GameUI"> 
+			<div class="x_header">
+	         	<div class="menu_item jokge">Jok.ge</div>
+	      	</div>
+			<div class="title">Galaxy</div>
+			<div class="group center" style="width: 800px; min-height: 500px;">
+				<div id="setup">
+	  				<div class="shipcolors">
+	  					<div data-tag="green" style="background-color: green;"></div>
+	  					<div data-tag="red" style="background-color: red;"></div>
+	  					<div data-tag="yellow" style="background-color: orange;"></div>
+	  					<div data-tag="blue" style="background-color: blue;"></div>
+	  					<div data-tag="purple" style="background-color: purple;"></div>
+	  				</div>
+	  				<br/>
+	  				<br/>
+	      			<hr>
+	      			<div class="button-set">
+	      				<button data-tag="0" class="disabled"><div class="vip_only">VIP Only</div><img width="0" height="0" src="">More speed</button>
+	      				<button data-tag="1" class="disabled"><img width="0" height="0" src="">Normal</button>
+	      				<button data-tag="2" class="disabled"><div class="vip_only">VIP Only</div><img width="0" height="0" src="">More hitpoints</button>
+	      			</div>
+	      			<hr>
+	      			<button class="play button green">Play!</button>
+	      		</div>
+	      	</div>
+	      </div>
+	</body>
 </html>

@@ -1,223 +1,237 @@
-var Setup = OZ.Class();
-Setup.URL = "ws://" + location.hostname + ":8888/space";
-Setup.prototype.init = function() {
-	this._dom = {};
-	this._ship = null;
-	
-	this._build();
-	if (localStorage.mode == "multi") {
-		this._clickMulti();
-	} else {
-		this._clickSingle();
+var user = undefined;
+
+var ui = {
+	selectedColor: undefined,
+	selectedShip: undefined,
+	init: function() {
+		this.selectedColor = localStorage.color || Ship.random().color;
+		this.selectedShip = typeof(localStorage.type) == "string" ? localStorage.type : 1;
+
+		this.selectColor(this.selectedColor);
+	},
+
+	selectColor: function(color) {
+		$('.shipcolors div').each(function(i) {
+			if ($(this).attr('data-tag') == color) {
+				$(this).attr('class', 'active');
+			}
+			else {
+				$(this).attr('class', '');
+			}
+		});
+		
+		for (var i=0;i<Ship.types.length;i++) {
+			var image = Ship.getImageName(color, i) + "_000.png";
+			$($('.button-set').children()[i]).find('img').attr('src', image);
+		}
+
+		ui.selectedColor = color;
+	},
+
+	selectShip: function(index) {
+		if (!user) return;
+		if (!user.IsVIPMember) {
+			var buttons = $('.button-set').children();
+			$(buttons[0]).attr('class', 'disabled');
+			$(buttons[1]).attr('class', 'active');
+			$(buttons[2]).attr('class', 'disabled');
+			this.selectedShip = 1;
+			return;
+		}
+
+		$('.button-set').find('button').each(function(i) {
+			if (i == index) {
+				$(this).attr('class', 'active');
+			}
+			else {
+				$(this).attr('class', '');
+			}
+		});
+
+		ui.selectedShip = index;
+	},
+
+	play: function() {
+
+		var self = this;
+
+		$('#GameUI').hide();
+		$('#Loading').show();
+
+		var onProgress = function () {
+	        $('#Loading').find('span.percentage').html(preload.progress * 100 | 0);
+	    }
+
+	    var onComplete = function () {
+	        if (loadingInterval)
+	            clearInterval(loadingInterval);
+
+	        $('#Loading').fadeTo('normal', 0, function () {
+	            $('#Loading').hide();
+				self._playInternal();
+	        });
+	    }
+
+	    var name1 = ['Feiyan', 'Gaalian', 'Maloc', 'Peleng', 'People'];
+	    var name2 = ['Liner', 'Pirate', 'Ranger'];
+
+	    var manifest = [];
+
+	    for (var i = 0; i < name1.length; i++) {
+	    	for (var j = 0; j < name2.length; j++) {
+
+	    		var id = name1[i] + '_' + name2[j] + '_64';
+
+	    		manifest.push({
+	    			id: id,
+	    			src: '/img/ships/' + id + '.png'
+	    		})
+	    	}
+	    }
+
+	    manifest.push({
+			id: 'explosion_128',
+			src: '/img/explosion_128.png'
+		});
+
+	    manifest.push({
+			id: 'plasma-red',
+			src: '/img/plasma-red.png'
+		});
+
+	    manifest.push({
+			id: 'plasma-white',
+			src: '/img/plasma-white.png'
+		});
+
+	    manifest.push({
+			id: 'plasma-yellow',
+			src: '/img/plasma-yellow.png'
+		});
+
+
+	    var preload = new createjs.PreloadJS();
+	    preload.onComplete = onComplete;
+	    preload.loadManifest(manifest);
+
+	    var loadingInterval = setInterval(onProgress, 200);
+	},
+
+	_playInternal: function() {
+		OZ.DOM.clear(document.body);
+		var game = null;
+		var ship = {
+			color: ui.selectedColor,
+			type: ui.selectedShip,
+			weaponType: 0
+		};
+		localStorage.color = ship.color;
+		localStorage.type = ship.type;
+		// localStorage.weapon = ship.weaponType;
+		
+		// if (OZ.DOM.hasClass(this._dom.single, "active")) {
+			// var enemies = parseInt(this._dom.enemies.value) || 10;
+			// console.log(enemies)
+			// var enemies = 5 +  Math.round(12 * Math.random());
+			// game = new Game.Single(user.Nick, ship, enemies);
+			// localStorage.mode = "single";
+		// } else {
+			var url = "ws://" + location.hostname + ':9003';
+
+			game = new Game.Multi(user.Nick, ship, url);
+			// localStorage.mode = "multi";
+		// }
+
+	    var el = document.documentElement
+	      , rfs =  el.requestFullScreen
+	            || el.webkitRequestFullScreen
+	            || el.mozRequestFullScreen;
+
+	    // rfs.call(el);
+
+		game.start();
+		
+		window.g = game;
 	}
-	
-	this._selectColor(localStorage.color || Ship.random().color);
-	this._selectWeapon(localStorage.weapon || 0);
-	this._selectShip(typeof(localStorage.type) == "string" ? localStorage.type : 1);
 }
 
-Setup.prototype._build = function() {
-	var container = OZ.DOM.elm("div", {id:"setup"});
-	
-	var h1 = OZ.DOM.elm("h1", {innerHTML:"Just Spaceships!"});
-	container.appendChild(h1);
-	
-	var label = OZ.DOM.elm("label", {innerHTML:"Name: "});
-	this._dom.name = OZ.DOM.elm("input", {type:"text"});
-	this._dom.name.value = localStorage.name || "Human pilot #" + Math.round(Math.random()*100+1);
-	label.appendChild(this._dom.name);
-	container.appendChild(label);
-	
-	container.appendChild(OZ.DOM.elm("hr"));
 
-	this._dom.single = this._buildButton("Singleplayer", this._clickSingle);
-	this._dom.multi = this._buildButton("Multiplayer", this._clickMulti);
-	container.appendChild(this._buildSet([this._dom.single, this._dom.multi]));
-	this._dom.variable = OZ.DOM.elm("div");
-	container.appendChild(this._dom.variable);
-	
-	container.appendChild(OZ.DOM.elm("hr"));
-	
-	var label = OZ.DOM.elm("label", {innerHTML:"Ship color: "});
-	this._dom.color = OZ.DOM.elm("select");
-	var colors = ["red", "green", "yellow", "blue", "purple"];
-	for (var i=0;i<colors.length;i++) {
-		var c = colors[i];
-		var o = OZ.DOM.elm("option", {value:c, innerHTML:c});
-		this._dom.color.appendChild(o);
+$('.jokge').live('click', function() {
+	window.location.assign('http://jok.ge');
+});
+
+$(function() {
+
+	/* Authorization */
+	var sid = $.cookie('sid');
+
+	var redirectToGetSID = function() {
+		window.location.assign('http://jok.ge/node/getsid?returnurl=' + window.location.origin);
 	}
-	OZ.Event.add(this._dom.color, "change", this._changeColor.bind(this));
-	label.appendChild(this._dom.color);
-	container.appendChild(label);
 
-	var label = OZ.DOM.elm("label", {innerHTML:"Weapon: "});
-	this._dom.weapon = OZ.DOM.elm("select");
-	var weapons = ["Normal", "More damage", "More range"];
-	for (var i=0;i<weapons.length;i++) {
-		var w = weapons[i];
-		var o = OZ.DOM.elm("option", {value:i, innerHTML:w});
-		this._dom.weapon.appendChild(o);
-	}
-	label.appendChild(this._dom.weapon);
-	container.appendChild(label);
+	if (!sid) {
+		if (!window.location.search) {
+			redirectToGetSID();
+			return;
+		}
 
-	var labels = ["More maneuverable", "Normal", "More hitpoints"];
-	var buttons = [];
-	for (var i=0;i<labels.length;i++) {
-		var button = this._buildButton(labels[i], this._clickShip);
-		var img = OZ.DOM.elm("img", {width:"64px", height:"64px"});
-		button.insertBefore(img, button.firstChild);
-		buttons.push(button);
-	}
-	this._dom.ships = this._buildSet(buttons);
-	container.appendChild(this._dom.ships);
-
-	container.appendChild(OZ.DOM.elm("hr"));
-	
-	var play = this._buildButton("Play!", this._play);
-	play.className = "play";
-	container.appendChild(play);
-
-	this._dom.singleDetails = OZ.DOM.elm("div");
-	var label = OZ.DOM.elm("label", {innerHTML:"Enemies: "});
-	this._dom.enemies = OZ.DOM.elm("input", {type:"text", value:"3", size:"2"});
-	label.appendChild(this._dom.enemies);
-	this._dom.singleDetails.appendChild(label);
-
-	this._dom.multiDetails = OZ.DOM.elm("div");
-	var label = OZ.DOM.elm("label", {innerHTML:"Server URL: "});
-	this._dom.url = OZ.DOM.elm("input", {type:"text"});
-	this._dom.url.value = this.constructor.URL;
-	label.appendChild(this._dom.url);
-	this._dom.multiDetails.appendChild(label);
-
-
-	document.body.appendChild(container);
-	
-	this._buildTips();
-}
-
-Setup.prototype._buildTips = function() {
-	var tips = OZ.DOM.elm("div", {id:"tips"});
-	var handle = OZ.DOM.elm("h2", {innerHTML:"gameplay&nbsp;tips"});
-	var content = OZ.DOM.elm("ul");
-	
-	var list = [
-		"Use arrow keys to control your ship; hold Ctrl or Spacebar to shoot",
-		"Reduce browser window size to increase frame rate",
-		"Ship's color and size has no effect on its performance",
-		"In order to play multiplayer, your browser must support Web Sockets (Firefox, Chrome)",
-		"Audio does not work well in Firefox/Linux, but other combinations are okay - put on your headphones!",
-		"Graphic sprites are &copy;&nbsp;Elemental Games",
-		"This game was created by <a href='http://ondras.zarovi.cz/'>Ondřej Žára</a>",
-	];
-	
-	while (list.length) { content.appendChild(OZ.DOM.elm("li", {innerHTML:list.shift()})); }
-	
-	
-	OZ.DOM.append(
-		[tips, handle, content],
-		[document.body, tips]
-	);
-}
-
-Setup.prototype._buildButton = function(innerHTML, cb) {
-	var button = OZ.DOM.elm("button");
-	button.innerHTML = innerHTML;
-	OZ.Event.add(button, "click", cb.bind(this));
-	return button;
-}
-
-Setup.prototype._buildSet = function(buttons) {
-	var set = OZ.DOM.elm("div", {className:"button-set"});
-	for (var i=0;i<buttons.length;i++) { set.appendChild(buttons[i]); }
-	return set;
-}
-
-Setup.prototype._activateButton = function(button) {
-	var buttons = button.parentNode.getElementsByTagName("button");
-	for (var i=0;i<buttons.length;i++) {
-		var b = buttons[i];
-		if (b == button) {
-			OZ.DOM.addClass(b, "active");
-		} else {
-			OZ.DOM.removeClass(b, "active");
+		var query = window.location.search.replace('?', '').split('=');
+		if (query.length >= 2 && query[0] == 'sid') {
+			sid = query[1];
+			$.cookie('sid', sid, { expires: 7 });
+		}
+		else {
+			redirectToGetSID();
+			return;
 		}
 	}
-}
 
-Setup.prototype._clickSingle = function(e) {
-	this._activateButton(this._dom.single);
-	OZ.DOM.clear(this._dom.variable);
-	this._dom.variable.appendChild(this._dom.singleDetails);
-}
+	$.get('http://jok.ge/node/userinfo/' + sid, function(data) {
+		if (!data.isSuccess)
+			window.location.assign('http://jok.ge/joinus?returnUrl=http://galaxy.jok.fm');
 
-Setup.prototype._clickMulti = function(e) {
-	this._activateButton(this._dom.multi);
-	OZ.DOM.clear(this._dom.variable);
-	this._dom.variable.appendChild(this._dom.multiDetails);
-}
+		user = data.user;
 
-Setup.prototype._changeColor = function(e) {
-	this._selectColor(OZ.Event.target(e).value);
-}
+		$('.play').show();
 
-Setup.prototype._selectColor = function(color) {
-	this._dom.color.value = color;
-	this._shipColor = color;
-	
-	for (var i=0;i<Ship.types.length;i++) {
-		var image = Ship.getImageName(color, i) + "_000.png";
-		this._dom.ships.getElementsByTagName("button")[i].getElementsByTagName("img")[0].src = image;
-	}
-}
+		var buttons = $('.button-set').children();
 
-Setup.prototype._selectWeapon = function(weapon) {
-	this._dom.weapon.value = weapon;
-}
+		if (!user.IsVIPMember) {
+			ui.selectedShip = 1;
 
-Setup.prototype._clickShip = function(e) {
-	var button = OZ.Event.target(e);
-	while (button.tagName.toLowerCase() != "button") { button = button.parentNode; }
-	var buttons = button.parentNode.getElementsByTagName("button");
-	for (var i=0;i<buttons.length;i++) {
-		if (button == buttons[i]) { this._selectShip(i); }
-	}
-}
+			$(buttons[0]).attr('class', 'disabled');
+			$(buttons[1]).attr('class', 'disabled');
+			$(buttons[2]).attr('class', 'disabled');
 
-Setup.prototype._selectShip = function(index) {
-	var buttons = this._dom.ships.getElementsByTagName("button");
-	this._activateButton(buttons[index]);
-	this._ship = index;
-}
+			$('.vip_only').show();
+		} else {
+			$(buttons[0]).attr('class', '');
+			$(buttons[1]).attr('class', '');
+			$(buttons[2]).attr('class', '');
+		}
 
-Setup.prototype._play = function(e) {
-	OZ.DOM.clear(document.body);
-	var game = null;
-	var name = this._dom.name.value;
-	var ship = {
-		color: this._dom.color.value,
-		type: this._ship,
-		weaponType: parseInt(this._dom.weapon.value)
-	};
-	localStorage.name = name;
-	localStorage.color = ship.color;
-	localStorage.type = ship.type;
-	localStorage.weapon = ship.weaponType;
-	
-	if (OZ.DOM.hasClass(this._dom.single, "active")) {
-		var enemies = parseInt(this._dom.enemies.value) || 3;
-		game = new Game.Single(name, ship, enemies);
-		localStorage.mode = "single";
-	} else {
-		var url = this._dom.url.value;
-		localStorage.url = url;
-		game = new Game.Multi(name, ship, url);
-		localStorage.mode = "multi";
-	}
-	
-	game.start();
-	
-	window.g = game;
-}
+		ui.selectShip(ui.selectedShip);
+	})
 
+
+	/* Events */
+	$('.shipcolors div').bind('click mouseenter touchstart', function() {
+		var color = $(this).attr('data-tag');
+
+		ui.selectColor(color);
+	});
+
+	$('.button-set button').click(function() {
+		var index = $(this).attr('data-tag');
+		
+		ui.selectShip(index);
+	});
+
+	$('.play').click(function() {
+		ui.play();
+	})
+
+
+
+	ui.init();
+});

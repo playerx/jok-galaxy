@@ -76,6 +76,11 @@ Ship.prototype.init = function(game, player, options) {
 		mass: null,
 		position: [randomX, randomY]
 	};
+
+
+
+
+
 	for (var p in options) { this._options[p] = options[p]; }
 	
 	/* take mass from type */
@@ -115,7 +120,7 @@ Ship.prototype.init = function(game, player, options) {
 		velocity: [0, 0] /* pixels per second */
 	}
 
-	this.setHP(Math.round(this._phys.mass*1000));
+	this.setHP(Math.round(this._phys.mass * 200));
 	this._mini = new Ship.Mini(game, def.color);
 
 	game.getEngine().addActor(this, Game.LAYER_SHIPS);
@@ -148,6 +153,12 @@ Ship.prototype.getPlayer = function() {
 }
 
 Ship.prototype.tick = function(dt) {
+	if (!this._alive) {
+		this._game.getEngine().removeActor(this, Game.LAYER_SHIPS);
+		this.dispatch("ship-purge");
+		return;
+	}
+
 	var changed = HAF.AnimatedSprite.prototype.tick.call(this, dt);
 
 	dt /= 1000;
@@ -240,7 +251,7 @@ Ship.prototype.die = function(enemy) {
 	if (enemy) { 
 		enemy.addKill(); 
 		var labelPos = this._sprite.position.clone();
-		this.showLabel(this._player.getName() + " killed by " + enemy.getName(), {size:30});
+		// this.showLabel(this._player.getName() + " killed by " + enemy.getName(), {size:30});
 	}
 
 	this._alive = false;
@@ -301,8 +312,10 @@ Ship.prototype._tickRotation = function(dt) {
 Ship.prototype._tickMovement = function(dt) {
 	var changed = false;
 
-	for (var i=0;i<2;i++) { /* adjust position */
+	for (var i=0;i<2;i++) { 
+		/* adjust position */
 		if (this._control.engine && this._alive) { /* engines add force => velocity */
+
 			var force = (this._control.engine > 0 ? 1 : 0.75) * this._options.maxForce * this._control.engine;
 			force *= (i ? Math.sin : Math.cos)(this._phys.orientation);
 			this._phys.velocity[i] += force * dt / this._phys.mass;

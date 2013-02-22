@@ -1,9 +1,5 @@
 var fs = require('fs')
 
-var rootDirectory = __dirname.substring(0, __dirname.indexOf('/server')) + '/';
-console.log('__dirname: ' + __dirname);
-console.log('root directory: ' + rootDirectory);
-
 /* mininal DOM environment */
 var nullElm = {
 	style: {},
@@ -20,19 +16,20 @@ var createjs = {};
 global.setTimeout = function() {};
 
 /* read all javascript files */
-var html = fs.readFileSync(rootDirectory + 'index.html', 'utf-8');
+var html = fs.readFileSync(__dirname + '/index.html', 'utf-8');
 
 var scripts = html.match(/js\/.*?\.js/g);
 var totalScript = '';
 for (var i=0;i<scripts.length;i++) {
 
-    if (scripts[i].indexOf('setup.js') > 0 ||
-        scripts[i].indexOf('setup.local.js') > 0) continue;
+    if (scripts[i].indexOf('jquery.min.js') > 0 ||
+        scripts[i].indexOf('preloadjs-0.2.0.js') > 0 ||
+        scripts[i].indexOf('setup.js') > 0) continue;
 
 	console.log('loading: ' + scripts[i]);
 
 	try {
-		var scr = fs.readFileSync(rootDirectory + scripts[i], 'utf-8');
+		var scr = fs.readFileSync(__dirname + "/" + scripts[i], 'utf-8');
 		totalScript += scr;
 		eval(scr);
 	} catch (e) {
@@ -41,13 +38,7 @@ for (var i=0;i<scripts.length;i++) {
 }
 /* */
 
-Game.Server.prototype._debug = function(str) {
-    console.log(str);
-}
-
 HAF.Engine.prototype.draw = function() {}
-
-
 
 
 /* Wrapper instance to get Game.Server */
@@ -64,7 +55,7 @@ var ws = {
 		ws.isInitialized = true;
 
         if (ws.gameServer.onidle) {
-            setInterval(ws.gameServer.onidle.bind(ws.gameServer), 15);
+            setInterval(ws.gameServer.onidle.bind(ws.gameServer), 1000 / 60 /*FPS*/);
         }
 	},
 	send: function(id, data) {
@@ -84,7 +75,7 @@ ws.initialize();
 /* Web Server */
 var WebSocketServer = require('websocket').server;
 var static = require('node-static');
-var file = new(static.Server)(rootDirectory);
+var file = new(static.Server)('./');
 
 
 server = require('http').createServer(function(req, res) {
@@ -95,8 +86,8 @@ server = require('http').createServer(function(req, res) {
         file.serve(req, res);
     });
 });
-server.listen(process.env.PORT || 8888, function() {
-    console.log((new Date()) + ' Server is listening on port 8888');
+server.listen(9003, function() {
+    console.log((new Date()) + ' Server is listening on port 9003');
 });
 
 wsServer = new WebSocketServer({
@@ -130,12 +121,13 @@ wsServer.on('request', function(request) {
     	return;
     }
 
-    console.log(JSON.stringify(request.requestedProtocols));
-    console.log(JSON.stringify(request.requestedExtensions));
     var connection = request.accept(null, request.origin);
-    console.log((new Date()) + ' Connection accepted.');
 
-
+    if (process.env.ENV != 'production') {
+        console.log(JSON.stringify(request.requestedProtocols));
+        console.log(JSON.stringify(request.requestedExtensions));
+        console.log((new Date()) + ' Connection accepted.');
+    }
 
     connection.clientid = Math.random().toString().replace("0.", "");
     clients[connection.clientid] = connection;
@@ -145,7 +137,10 @@ wsServer.on('request', function(request) {
 
     connection.on('message', function(message) {
         if (message.type === 'utf8') {
-            console.log('Received Message: ' + message.utf8Data);
+            if (process.env.ENV != 'production') {
+                console.log('Received Message: ' + message.utf8Data);
+            }
+
             connection.sendUTF(message.utf8Data);
 
         	ws.gameServer.onmessage(connection.clientid, message.utf8Data);
@@ -161,11 +156,13 @@ wsServer.on('request', function(request) {
     		delete clients[connection.clientid];
     	}
 
-        console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+        if (process.env.ENV != 'production') {
+            console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+        }
     	ws.gameServer.ondisconnect(connection.clientid, '', '');
     });
     connection.on('error', function(err) {
-        console.log((new Date()) + ' Error: ' + err);
+        console.log((new Date()) + ' error: ' + err);
     });
 });
 

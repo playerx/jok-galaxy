@@ -17,8 +17,8 @@ var activeKeys = [];
 
 Keyboard.prototype._keydown = function(e) {
 	if (!this._control) { return; }
-
-	if (activeKeys.indexOf(e.keyCode) > -1) { return; }
+	
+	if (activeKeys.indexOf(e.keyCode) > -1) return;
 
 	activeKeys.push(e.keyCode);
 
@@ -65,7 +65,7 @@ Keyboard.prototype._keyup = function(e) {
 	if (!this._control) { return; }
 
 	var index = activeKeys.indexOf(e.keyCode);
-	if (index == -1) { return; }
+	if (index == -1) return;
 
 	activeKeys.splice(index, 1);
 

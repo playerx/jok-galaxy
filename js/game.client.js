@@ -89,6 +89,8 @@ Game.Client.prototype._resize = function() {
 }
 
 Game.Client.prototype._initDebug = function(chart) {
+	return;
+	
 	var monitor1 = new HAF.Monitor.Sim(this._engine, [220, 100], {textColor:"#888", chart:chart}).getContainer();
 	monitor1.style.position = "absolute";
 	monitor1.style.left = "0px";

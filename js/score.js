@@ -14,6 +14,7 @@ Score.prototype._change = function() {
 	var lines = [];
 	var maxName = 20;
 
+
 	var players = this._game.getPlayers();
 	for (var id in players) {
 		var player = players[id];

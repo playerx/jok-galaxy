@@ -66,7 +66,8 @@ Game.Server.prototype.onconnect = function(client, headers) {
 Game.Server.prototype.ondisconnect = function(client, code, message) {
 	var index = this._clients.indexOf(client);
 	if (index == -1) { 
-		this._debug("Disconnecting non-existant client " + client);
+		// this._debug("Disconnecting non-existant client " + client);
+		console.log("Disconnecting non-existant client " + client);
 		return;
 	}
 
@@ -74,7 +75,8 @@ Game.Server.prototype.ondisconnect = function(client, code, message) {
 	var player = this._clientPlayers[index];
 	this._clientPlayers.splice(index, 1);
 	if (!player) { 
-		this._debug("Disconnecting client with undefined player " + client);
+		// this._debug("Disconnecting client with undefined player " + client);
+		console.log("Disconnecting non-existant client " + client);
 		return; 
 	}
 	
@@ -174,6 +176,8 @@ Game.Server.prototype.onidle = function() {
 			this._ws.send(this._clients[i], data);
 		}
 	}
+
+	if (process.env.ENV == "production") return;
 	
 	if (ts - this._ts.stats > this._options.stats) { /* show stats */
 		this._ts.stats = ts;
@@ -185,7 +189,6 @@ Game.Server.prototype.onidle = function() {
 		}
 		this._debug("[stats] " + players + " players, " + ships + " ships");
 	}
-
 }
 
 Game.Server.prototype._getState = function() {
@@ -201,6 +204,11 @@ Game.Server.prototype._getState = function() {
 	}
 	return obj;
 }
+
+Game.Server.prototype.isOnlineSever = function() {
+	return true;
+}
+
 
 /**
  * Merge ship data with existing ship
@@ -258,5 +266,7 @@ Game.Server.prototype._removePlayer = function(id) {
 }
 
 Game.Server.prototype._debug = function(str) {
-	system.stdout.writeLine(str);
+	if (process.env.ENV == 'production') return;
+
+	console.log(str);
 }
