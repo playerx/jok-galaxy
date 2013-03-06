@@ -166,7 +166,7 @@ $(function() {
 	var sid = $.cookie('sid');
 
 	var redirectToGetSID = function() {
-		window.location.assign('http://jok.ge/node/getsid?returnurl=' + window.location.origin);
+		window.location.assign('http://old.jok.ge/node/getsid?returnurl=' + window.location.origin);
 	}
 
 	if (!sid) {
@@ -186,9 +186,9 @@ $(function() {
 		}
 	}
 
-	$.get('http://jok.ge/node/userinfo/' + sid, function(data) {
+	$.get('http://old.jok.ge/node/userinfo/' + sid, function(data) {
 		if (!data.isSuccess)
-			window.location.assign('http://jok.ge/joinus?returnUrl=http://galaxy.jok.fm');
+			window.location.assign('http://old.jok.ge/joinus?returnUrl=http://galaxy.jok.fm');
 
 		user = data.user;
 
