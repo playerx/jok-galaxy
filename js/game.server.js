@@ -161,20 +161,38 @@ Game.Server.prototype.onmessage = function(client, data) {
 }
 
 Game.Server.prototype.onidle = function() {
+
 	this._engine.tick();
+
 	var ts = Date.now();
 	
 	if (ts - this._ts.idle > this._options.idle) { /* send sync info to all clients */
 		this._ts.idle = ts;
+
+		// ადრე იყო ყველას ეგზავნებოდა საერთო სტეიტი 500 მილიწამში ერთხელ, შეიცვალა და ეხლა ყველას ეგზავნება მხოლოდ საკუთარი 5 წამში ერთხელ
+		// ხოლო პოზიციების განახლება ხდება ყოველ მოთამაშის ქმედებაზე, გარდა სროლის დაწყება გათიშვისა
+
 		var state = this._getState();
 		var data = {
 			type: Game.MSG_SYNC,
 			data: state
 		}
 		data = JSON.stringify(data);
+
+
+		// ყველასთვის საკუთარი სტეიტის გაგზავნა
 		for (var i=0;i<this._clients.length;i++) {
+
+			// var ship = this._players[id].getShip();
+			
+			// var data[id] = {
+			// 	phys: ship.getPhys(),
+			// 	control: ship.getControl()
+			// }
+
 			this._ws.send(this._clients[i], data);
 		}
+
 	}
 
 	if (process.env.ENV == "production") return;
@@ -214,6 +232,7 @@ Game.Server.prototype.isOnlineSever = function() {
  * Merge ship data with existing ship
  */
 Game.Server.prototype._mergeShip = function(ship, data) {
+
 	if (data.control) {
 		var control = ship.getControl();
 		for (var p in data.control) { control[p] = data.control[p]; }

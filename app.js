@@ -1,3 +1,6 @@
+
+process.env.ENV = 'production';
+
 var fs = require('fs')
 
 /* mininal DOM environment */

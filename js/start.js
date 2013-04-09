@@ -6,7 +6,7 @@ var ui = {
 
 		var self = this;
 
-		$('#GameUI').hide();
+		$('#jok').hide();
 		$('#Loading').show();
 
 		var onProgress = function () {
@@ -19,6 +19,7 @@ var ui = {
 
 	        $('#Loading').fadeTo('normal', 0, function () {
 	            $('#Loading').hide();
+	            $('#jok').show('fast');
 				self._playInternal();
 	        });
 	    }
@@ -73,15 +74,17 @@ var ui = {
 
 		var game = null;
 		var ship = {
-			color: 'green',
-			type: 1,
+			color: $.cookie('galaxy-shipcolor') || 'red',
+			type: $.cookie('galaxy-shiptype') || 1,
 			weaponType: 0
 		};
+
+		var usernick = $.cookie('usernick') || '';
 		
 
 		var url = "ws://" + location.hostname + ':9003';
 
-		game = new Game.Multi(user.Nick, ship, url);
+		game = new Game.Multi(usernick, ship, url);
 		game.start();
 		
 		window.g = game;
@@ -92,37 +95,43 @@ $(function() {
 
 	/* Authorization */
 	var sid = $.cookie('sid');
-
-	var redirectToGetSID = function() {
-		console.log('redirect')
-		// window.location.assign('http://old.jok.ge/node/getsid?returnurl=' + window.location.origin);
-	}
-
 	if (!sid) {
-		console.log(window.location.search)
-		if (!window.location.search) {
-			redirectToGetSID();
-			return;
-		}
-
-		var query = window.location.search.replace('?', '').split('=');
-		console.log(query)
-		if (query.length >= 2 && query[0] == 'sid') {
-			sid = query[1];
-			$.cookie('sid', sid, { expires: 7 });
-		}
-		else {
-			redirectToGetSID();
-			return;
-		}
+		window.location.assign(jok.config.authorizationUrl);
+		return;
 	}
 
-	$.get('http://old.jok.ge/node/userinfo/' + sid, function(data) {
-		// if (!data.isSuccess)
-		// 	window.location.assign('http://jok.ge/joinus?returnUrl=http://galaxy.jok.fm');
+	ui.play();
 
-		user = data.user;
+	// var redirectToGetSID = function() {
+	// 	console.log('redirect')
+	// 	// window.location.assign('http://old.jok.ge/node/getsid?returnurl=' + window.location.origin);
+	// }
+
+	// if (!sid) {
+	// 	console.log(window.location.search)
+	// 	if (!window.location.search) {
+	// 		redirectToGetSID();
+	// 		return;
+	// 	}
+
+	// 	var query = window.location.search.replace('?', '').split('=');
+	// 	console.log(query)
+	// 	if (query.length >= 2 && query[0] == 'sid') {
+	// 		sid = query[1];
+	// 		$.cookie('sid', sid, { expires: 7 });
+	// 	}
+	// 	else {
+	// 		redirectToGetSID();
+	// 		return;
+	// 	}
+	// }
+
+	// $.get('http://old.jok.ge/node/userinfo/' + sid, function(data) {
+	// 	// if (!data.isSuccess)
+	// 	// 	window.location.assign('http://jok.ge/joinus?returnUrl=http://galaxy.jok.fm');
+
+	// 	user = data.user;
 		
-		ui.play();
-	})
+	// 	ui.play();
+	// })
 });

@@ -7,19 +7,22 @@ body {
 }
 
 #Loading{
-	background:url('http://jok.ge/images/shared/joklogo.png') top left no-repeat;
-	text-align:center;
-	color:silver;
-	top:50%;
-	margin-top:-75px;
-	position:absolute;
-	width:100px;left:50%;
-	font-weight:bold;
-	padding-top:90px;
-	padding-left:6px;
-	margin-left:-50px;
+	background: url('http://play.jok.io/images/joklogo_transparent.png') top left no-repeat;
+	background-size: 89px;
+	text-align: center;
+	color: white;
+	top: 50%;
+	margin-top: -75px;
+	position: absolute;
+	width: 100px;
+	left: 50%;
+	font-weight: bold;
+	padding-top: 90px;
+	padding-left: 6px;
+	margin-left: -50px;
 	z-index: 1;
 	display: none;
+	opacity: 0.8;
 }
 
 .jokge {

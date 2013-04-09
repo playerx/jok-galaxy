@@ -22,6 +22,7 @@ Keyboard.prototype._keydown = function(e) {
 
 	activeKeys.push(e.keyCode);
 
+	var isNavigationChange = false;
 
 	switch (e.keyCode) {
 		case 17:
@@ -32,33 +33,39 @@ Keyboard.prototype._keydown = function(e) {
 		case 37:
 			this._control.torque.mode = 2;
 			this._control.torque.target = -1;
+			isNavigationChange = true;
 		break;
 		case 68: // D
 		case 39:
 			this._control.torque.mode = 2;
 			this._control.torque.target = +1;
+			isNavigationChange = true;
 		break;
 		
 		case 87: // W
 		case 38: 
 			this._control.engine = 1;
+			isNavigationChange = true;
 		break;
 		case 83: // S
 		case 40:
 			this._control.engine = -1;
+			isNavigationChange = true;
 		break;
 
 		case 81: // Q
 			this._control.engine2 = -1;
+			isNavigationChange = true;
 		break;
 
 		case 69: // E
 			this._control.engine2 = +1;
+			isNavigationChange = true;
 		break;
 	}
 
 	/* FIXME jen pri zmene? */
-	this.dispatch("keyboard-change");
+	this.dispatch("keyboard-change", { isNavigationChange: isNavigationChange });
 }
 
 Keyboard.prototype._keyup = function(e) {
@@ -68,6 +75,8 @@ Keyboard.prototype._keyup = function(e) {
 	if (index == -1) return;
 
 	activeKeys.splice(index, 1);
+
+	var isNavigationChange = false;
 
 
 	switch (e.keyCode) {
@@ -81,6 +90,7 @@ Keyboard.prototype._keyup = function(e) {
 		case 37:
 		case 39:
 			this._control.torque.mode = 0;
+			isNavigationChange = true;
 		break;
 		
 		case 87: // W
@@ -88,14 +98,16 @@ Keyboard.prototype._keyup = function(e) {
 		case 38:
 		case 40:
 			this._control.engine = 0;
+			isNavigationChange = true;
 		break;
 
 
 		case 81: // Q
 		case 69: // E
 			this._control.engine2 = 0;
+			isNavigationChange = true;
 		break;
 	}
 	/* FIXME jen pri zmene? */
-	this.dispatch("keyboard-change");
+	this.dispatch("keyboard-change", { isNavigationChange: isNavigationChange });
 }

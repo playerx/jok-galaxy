@@ -28,76 +28,29 @@
 		<script src="js/weapon.projectile.js"></script>
 		<script src="js/label.js"></script>
 		<script src="js/score.js"></script>
-		<script src="js/start.js"></script>
-
-		<link rel="stylesheet" type="text/css" href="http://play.jok.io/css" />
+		<script src="js/setup.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/style.css" />
 		<link rel="stylesheet" type="text/css" href="css/env.css" />
-		<style>
-			#jok {
-				z-index: 100;
-				position: relative;
-			}
-			#Game {
-				position: absolute;
-				width: 100%;
-				height: 100%;
-				margin-top: 0px;
-			}
-			#Root {
-				background-color: transparent;
-			}
-			#BackgroundMaterial,
-			#Background {
-				display: none;
-			}
-
-			#Info {
-				position: absolute;
-				left: 20px;
-				bottom: 0px;
-			}
-
-			#Player1,
-			#Player1 .music_player {
-				display: block;
-			}
-			#Player1 .music_player {
-				background: transparent;
-				opacity: .7;
-			}
-			#Player1 .music_player .jokfm_plugin div.item {
-				display: none;
-			}
-			#Player1 .music_player:hover {
-				background: #747474;
-				opacity: 1;
-			}
-			#Player1 .music_player:hover .jokfm_plugin div.item {
-				display: block;
-			}
-
-			#Player1 .music_player .jokfm_plugin .active_channel{
-				bottom: 0px;
-			}
-		</style>
-
-		<script>
-			var jok = {};
-
-	        jok.config = {
-	            gameid: '1',
-	            channel: '',
-	            language: 'ka_GE',
-	            exitUrl: 'http://jok.ge'
-	        }
-		</script>
 	</head>
 	<body>
-		<div id="Loading">
-	        <span class="percentage">0</span>%
-	    </div>
-	    <div id="Game"></div>
-	    <script src="http://play.jok.io/js"></script>
+		<div id="setup">
+			<div class="shipcolors">
+				<div data-tag="green" style="background-color: green;"></div>
+				<div data-tag="red" style="background-color: red;"></div>
+				<div data-tag="yellow" style="background-color: orange;"></div>
+				<div data-tag="blue" style="background-color: blue;"></div>
+				<div data-tag="purple" style="background-color: purple;"></div>
+			</div>
+			<br/>
+			<br/>
+  			<hr>
+  			<div class="button-set">
+  				<button data-tag="0" class="disabled"><div class="vip_only">VIP Only</div><img width="0" height="0" src="">More speed</button>
+  				<button data-tag="1" class="disabled"><img width="0" height="0" src="">Normal</button>
+  				<button data-tag="2" class="disabled"><div class="vip_only">VIP Only</div><img width="0" height="0" src="">More hitpoints</button>
+  			</div>
+  			<hr>
+  			<button class="play button green">Play!</button>
+  		</div>
 	</body>
 </html>

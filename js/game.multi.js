@@ -22,7 +22,7 @@ Game.Multi.prototype.start = function() {
 }
 
 Game.Multi.prototype._close = function(e) {
-	alert("Connection closed: " + e.code + " " + e.reason);
+	this.start();
 }
 
 Game.Multi.prototype._open = function(e) {
@@ -42,6 +42,9 @@ Game.Multi.prototype._open = function(e) {
 
 Game.Multi.prototype._message = function(e) {
 	var data = JSON.parse(e.data);
+	var currentPlayer = this._player;
+	var currentDate = new Date();
+
 	switch (data.type) {
 		case Game.MSG_SYNC:
 		case Game.MSG_CHANGE:
@@ -57,6 +60,15 @@ Game.Multi.prototype._message = function(e) {
 				if (!ship) {
 					console.warn("[change/sync] player "+player.getName()+" does not have a ship");
 					continue;
+				}
+
+				if (data.type == Game.MSG_SYNC) {
+					if ((currentPlayer == player) && 
+					    (currentPlayer.lastUpdateTime && currentDate - currentPlayer.lastUpdateTime < 10000)) {
+						continue;
+					}
+
+					currentPlayer.lastUpdateTime = currentDate;
 				}
 				
 				this._mergeShip(ship, playerData);
@@ -149,7 +161,15 @@ Game.Multi.prototype._send = function(type, data) {
 
 Game.Multi.prototype._keyboardChange = function(e) {
 	var data = {};
-	data[this._player.getId()] = {control:this._control};
+	data[this._player.getId()] = {
+		control: this._control
+	};
+
+	// თუ ნავიგაციის ცვლილებაა, მაშინ კოორდინატებიც უნდა გაეგზავნოს და დაკორექტირდეს სერვერზე
+	if (e.data.isNavigationChange) {
+		data[this._player.getId()].phys = this._player._ship._phys;
+	}
+
 	this._send(Game.MSG_CHANGE, data);
 }
 

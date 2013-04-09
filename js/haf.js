@@ -194,6 +194,7 @@ HAF.Engine.prototype.stop = function() {
  * (Physics) Time step
  */
 HAF.Engine.prototype.tick = function() {
+
 	if (!this._running) { return; }
 	
 	setTimeout(this.tick, 1000/this._options.fps);
@@ -219,7 +220,8 @@ HAF.Engine.prototype.tick = function() {
 		}
 
 	}
-	
+
+
 	this.dispatch("tick", {delay:dt, time:Date.now()-ts1, all:allActors, changed:changedActors});
 }
 
