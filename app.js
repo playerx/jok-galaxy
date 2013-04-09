@@ -22,6 +22,7 @@ global.setTimeout = function() {};
 /* read all javascript files */
 var html = fs.readFileSync(__dirname + '/index.html', 'utf-8');
 
+
 var scripts = html.match(/js\/.*?\.js/g);
 var totalScript = '';
 for (var i=0;i<scripts.length;i++) {
