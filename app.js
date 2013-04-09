@@ -14,6 +14,7 @@ var location = {};
 var document = {
 	createElement: function() { return nullElm; }
 };
+
 var navigator = {userAgent:""};
 var createjs = {};
 global.setTimeout = function() {};
