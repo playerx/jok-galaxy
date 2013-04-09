@@ -7,7 +7,7 @@ Player.Human.prototype.init = function(game, name, id) {
 	OZ.Event.add(window, "keydown", this._keydown.bind(this));
 	OZ.Event.add(window, "keyup", this._keyup.bind(this));
 	
-	this._idleNode = OZ.DOM.elm("div", {innerHTML:"Press Enter to start", className:"idle", position:"absolute"});
+	this._idleNode = OZ.DOM.elm("div", {innerHTML:"Press [SPACE] to start", className:"idle", position:"absolute"});
 	this._idle = false;
 	
 	this._pan = {
@@ -51,7 +51,7 @@ Player.Human.prototype._keydown = function(e) {
 	if (this._ship) { return; }
 	
 	switch (e.keyCode) {
-		case 13:
+		case 32:
 			if (this._idle) { this.createShip(); }
 		break;
 		

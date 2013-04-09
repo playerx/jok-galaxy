@@ -48,6 +48,7 @@ Weapon.Projectile.prototype.tick = function(dt) {
 		for (var id in players) {
 			var ship = players[id].getShip();
 			if (!ship || ship == thisShip) { continue; }
+			if (ship.getColor() == thisShip.getColor()) { continue; }
 			if (ship.collidesWith(this._phys.position)) {
 				ship.damage(this._weapon);
 				this._game.getEngine().removeActor(this, Game.LAYER_FX);

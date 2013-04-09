@@ -166,16 +166,19 @@ $(function() {
 	var sid = $.cookie('sid');
 
 	var redirectToGetSID = function() {
-		window.location.assign('http://old.jok.ge/node/getsid?returnurl=' + window.location.origin);
+		console.log('redirect')
+		// window.location.assign('http://old.jok.ge/node/getsid?returnurl=' + window.location.origin);
 	}
 
 	if (!sid) {
+		console.log(window.location.search)
 		if (!window.location.search) {
 			redirectToGetSID();
 			return;
 		}
 
 		var query = window.location.search.replace('?', '').split('=');
+		console.log(query)
 		if (query.length >= 2 && query[0] == 'sid') {
 			sid = query[1];
 			$.cookie('sid', sid, { expires: 7 });
@@ -187,8 +190,8 @@ $(function() {
 	}
 
 	$.get('http://old.jok.ge/node/userinfo/' + sid, function(data) {
-		if (!data.isSuccess)
-			window.location.assign('http://old.jok.ge/joinus?returnUrl=http://galaxy.jok.fm');
+		// if (!data.isSuccess)
+		// 	window.location.assign('http://jok.ge/joinus?returnUrl=http://galaxy.jok.fm');
 
 		user = data.user;
 

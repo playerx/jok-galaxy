@@ -19,7 +19,7 @@ Game.Client.prototype.init = function(playerName, playerShipOptions) {
 
 Game.Client.prototype.start = function() {
 	Game.prototype.start.call(this);
-	Game.Audio.play("neointro");
+	// Game.Audio.play("neointro");
 }
 
 Game.Client.prototype.getPort = function() {
@@ -63,7 +63,7 @@ Game.Client.prototype.setOffset = function(offset) {
 
 Game.Client.prototype._initEngine = function() {
 	Game.prototype._initEngine.call(this);
-	document.body.appendChild(this._engine.getContainer());
+	document.getElementById('Game').appendChild(this._engine.getContainer());
 
 	this._map = new Map(this, [100, 100]);
 

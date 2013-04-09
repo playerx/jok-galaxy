@@ -79,6 +79,7 @@ var file = new(static.Server)('./');
 
 
 server = require('http').createServer(function(req, res) {
+
   	req.addListener('end', function () {
         //
         // Serve files!
