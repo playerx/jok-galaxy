@@ -98,9 +98,11 @@ Ship.prototype.init = function(game, player, options) {
 	this._deathTime = 0;
 	this._alive = true;
 	this._hp = 0;
+	this._maxhp = 0; 	//მაქსიმალური სიცოცხლე
+	this._remotehp = 0; //სერვერიდან გამოგზავნილი hp
 	this._boxSize = [
-		this._sprite.size[0] + 8,
-		this._sprite.size[1] + 8
+		this._sprite.size[0] + 8, 
+		this._sprite.size[1] + 28  
 	];
 	this._weapon = new Weapon(this._game, this, this._options.weaponType);	
 	this._control = {
@@ -120,7 +122,8 @@ Ship.prototype.init = function(game, player, options) {
 		velocity: [0, 0] /* pixels per second */
 	}
 
-	this.setHP(Math.round(this._phys.mass * 200));
+	this._remotehp = this._maxhp = Math.round(this._phys.mass * 200);
+	this.setHP(this._maxhp);
 	this._mini = new Ship.Mini(game, def.color);
 
 	game.getEngine().addActor(this, Game.LAYER_SHIPS);
@@ -178,6 +181,11 @@ Ship.prototype.getBox = function() {
 	for (var i=0;i<2;i++) {
 		tmp[i] = (this._sprite.position[i] - offset[i]).mod(this._size[i]) - this._sprite.size[i]/2 - 4;
 	}
+
+	if (this._boxSize[0] > 72) {
+		tmp[0] -= (this._boxSize[0] - 72) / 2;
+	}
+
 	return [tmp, this._boxSize];
 }
 
@@ -205,7 +213,33 @@ Ship.prototype.draw = function(context) {
 			context.globalAlpha = (limit-dt) / limit;
 		}
 	}
+
+
+
+
 	context.translate(tmp[0], tmp[1]);
+
+
+	var nick = this._player._name || '';
+
+
+	if (nick != $.cookie('usernick')) {
+
+		context.globalAlpha = .4;
+		context.font = 'normal 11pt Calibri';
+		context.fillStyle = 'white';
+		var metrics = context.measureText(nick);
+		if (metrics.width > this._boxSize[0])
+			this._boxSize[0] = metrics.width + 4;
+
+		context.fillText(nick, -1 * (metrics.width / 2), 45);
+	}
+
+	context.globalAlpha = .6;
+	context.fillStyle = 'green';
+	context.fillRect(-30, 30, 60 * (this._remotehp / this._maxhp), 2);
+	context.globalAlpha = 1;
+
 	context.rotate(angle);
 	context.translate(-tmp[0], -tmp[1]);
 
@@ -215,7 +249,15 @@ Ship.prototype.draw = function(context) {
 		tmp[0]-this._sprite.size[0]/2, tmp[1]-this._sprite.size[1]/2, this._sprite.size[0], this._sprite.size[1]
 	);
 
+	// context.globalAlpha = 1;
+	// context.font = font;
+	// context.textBaseline = "top";
+	
+
 	context.restore();
+
+	
+
 }
 
 Ship.prototype.collidesWith = function(position) {
@@ -234,9 +276,21 @@ Ship.prototype.setHP = function(hp) {
 	return this;
 }
 
+Ship.prototype.setRemoteHP = function(hp) {
+	this._remotehp = hp;
+	return this;
+}
+
+
+
 Ship.prototype.damage = function(weapon) {
 	var amount = weapon.getDamage();
 	this._hp -= amount;
+	this._remotehp -= amount;
+
+	if (this._remotehp <= 0)
+		this._remotehp = 10; // თუ რამეა, სერვერიდან მოვა აფეთქება
+	
 	
 	var labelPos = this._sprite.position.clone();
 	labelPos[1] -= this._sprite.size[1]/2;

@@ -24,6 +24,12 @@ Game.Server.prototype.init = function(ws, options) {
 	this._clientPlayers = [];
 	
 	this._ws.addApplication(this);
+
+	setInterval(this.cleanup.bind(this), 1000);
+}
+
+Game.Server.prototype.cleanup = function() {
+	this._engine.cleanup();
 }
 
 Game.Server.prototype.start = function() {
@@ -76,7 +82,7 @@ Game.Server.prototype.ondisconnect = function(client, code, message) {
 	this._clientPlayers.splice(index, 1);
 	if (!player) { 
 		// this._debug("Disconnecting client with undefined player " + client);
-		console.log("Disconnecting non-existant client " + client);
+		console.log("Disconnecting non-existant undefined player " + client);
 		return; 
 	}
 	
@@ -193,6 +199,8 @@ Game.Server.prototype.onidle = function() {
 			this._ws.send(this._clients[i], data);
 		}
 
+		data = null;
+
 	}
 
 	if (process.env.ENV == "production") return;
@@ -217,7 +225,8 @@ Game.Server.prototype._getState = function() {
 		
 		obj[id] = {
 			phys: ship.getPhys(),
-			control: ship.getControl()
+			control: ship.getControl(),
+			hp: ship.getHP()
 		}
 	}
 	return obj;
@@ -236,10 +245,12 @@ Game.Server.prototype._mergeShip = function(ship, data) {
 	if (data.control) {
 		var control = ship.getControl();
 		for (var p in data.control) { control[p] = data.control[p]; }
+		control = null;
 	}
 	if (data.phys) {
 		var phys = ship.getPhys();
 		for (var p in data.phys) { phys[p] = data.phys[p]; }
+		phys = null;
 	}
 }
 

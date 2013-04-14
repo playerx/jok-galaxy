@@ -1,49 +1,8 @@
 
 process.env.ENV = 'production';
 
-var fs = require('fs')
+var Game = require('./jsfiles-loader')
 
-/* mininal DOM environment */
-var nullElm = {
-	style: {},
-	appendChild: function() {},
-	getContext: function() {}
-}
-var window = {};
-var location = {};
-var document = {
-	createElement: function() { return nullElm; }
-};
-
-var navigator = {userAgent:""};
-var createjs = {};
-global.setTimeout = function() {};
-
-/* read all javascript files */
-var html = fs.readFileSync(__dirname + '/index.html', 'utf-8');
-
-
-var scripts = html.match(/js\/.*?\.js/g);
-var totalScript = '';
-for (var i=0;i<scripts.length;i++) {
-
-    if (scripts[i].indexOf('jquery.min.js') > 0 ||
-        scripts[i].indexOf('preloadjs-0.2.0.js') > 0 ||
-        scripts[i].indexOf('setup.js') > 0) continue;
-
-	console.log('loading: ' + scripts[i]);
-
-	try {
-		var scr = fs.readFileSync(__dirname + "/" + scripts[i], 'utf-8');
-		totalScript += scr;
-		eval(scr);
-	} catch (e) {
-		console.log(e);
-	}
-}
-/* */
-
-HAF.Engine.prototype.draw = function() {}
 
 
 /* Wrapper instance to get Game.Server */
@@ -85,12 +44,12 @@ var file = new(static.Server)('./');
 
 server = require('http').createServer(function(req, res) {
 
-  	req.addListener('end', function () {
-        //
-        // Serve files!
-        //
+    req.on('data', function(data) {
+    })
+
+    req.on('end', function() {
         file.serve(req, res);
-    });
+    })
 });
 server.listen(9003, function() {
     console.log((new Date()) + ' Server is listening on port 9003');
@@ -130,9 +89,9 @@ wsServer.on('request', function(request) {
     var connection = request.accept(null, request.origin);
 
     if (process.env.ENV != 'production') {
-        console.log(JSON.stringify(request.requestedProtocols));
-        console.log(JSON.stringify(request.requestedExtensions));
-        console.log((new Date()) + ' Connection accepted.');
+        // console.log(JSON.stringify(request.requestedProtocols));
+        // console.log(JSON.stringify(request.requestedExtensions));
+        // console.log((new Date()) + ' Connection accepted.');
     }
 
     connection.clientid = Math.random().toString().replace("0.", "");
@@ -163,7 +122,7 @@ wsServer.on('request', function(request) {
     	}
 
         if (process.env.ENV != 'production') {
-            console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+            // console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
         }
     	ws.gameServer.ondisconnect(connection.clientid, '', '');
     });
@@ -172,6 +131,14 @@ wsServer.on('request', function(request) {
     });
 });
 
+
+
+
+// ws.gameServer.onconnect(connection.clientid, request.httpRequest.headers);
+
+// ws.gameServer.onmessage(connection.clientid, message.utf8Data);
+
+// ws.gameServer.ondisconnect(connection.clientid, '', '');
 
 
 

@@ -181,6 +181,7 @@ HAF.Engine.prototype.start = function() {
 	this._ts.draw = ts;
 	this.tick();
 	this.draw();
+	this.cleanup();
 	return this;
 }
 
@@ -220,7 +221,6 @@ HAF.Engine.prototype.tick = function() {
 		}
 
 	}
-
 
 	this.dispatch("tick", {delay:dt, time:Date.now()-ts1, all:allActors, changed:changedActors});
 }
@@ -288,6 +288,25 @@ HAF.Engine.prototype.draw = function() {
 	}
 	
 	this.dispatch("draw", {delay:dt, time:Date.now()-ts1, all:allActors, drawn:drawnActors});
+}
+
+HAF.Engine.prototype.cleanup = function() {
+	for (var id in this._layers) {
+
+		var layer = this._layers[id];
+		var actors = layer.actors;
+		var allCount = actors.length;
+
+		for (var i=0;i<allCount;i++) {
+			var actor = actors[i];
+			if (actor.dead) { /* empty record: was recently deleted and cleared */
+				actors.splice(i, 1);
+				i--;
+				allCount--;
+				continue;
+			}
+		}
+	}
 }
 
 HAF.Engine.prototype._updateDirtyActors = function(layer) {
@@ -409,7 +428,7 @@ HAF.Monitor.prototype._event = function(e) {
 	if (this._data.length > this._size[0]) { this._data.shift(); }
 	this._avg.push(this._data[this._data.length-1]);
 	if (this._avg.length > 30) { this._avg.shift(); }
-	if (!this._paused) { this._draw(); }
+	if (!this._paused) { this._draw(); this.cleanup(); }
 }
 
 HAF.Monitor.prototype._draw = function() {

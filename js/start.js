@@ -74,7 +74,7 @@ var ui = {
 
 		var game = null;
 		var ship = {
-			color: $.cookie('galaxy-shipcolor') || 'red',
+			color: $.cookie('galaxy-shipcolor') || ((new Date().getMilliseconds() % 2) == 1 ? 'red' : 'yellow'),
 			type: $.cookie('galaxy-shiptype') || 1,
 			weaponType: 0
 		};
@@ -135,3 +135,20 @@ $(function() {
 	// 	ui.play();
 	// })
 });
+
+
+var TestMode = function(count) {
+
+	var ship = {
+		color: $.cookie('galaxy-shipcolor') || 'red',
+		type: $.cookie('galaxy-shiptype') || 1,
+		weaponType: 0
+	};
+	var usernick = $.cookie('usernick') || '';
+	var url = "ws://" + location.hostname + ':9003';
+
+
+	for (var i = 0; i < count; i++) {
+		new Game.Multi(usernick, ship, url).start();
+	};
+}

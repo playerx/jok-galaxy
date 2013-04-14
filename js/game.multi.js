@@ -22,6 +22,8 @@ Game.Multi.prototype.start = function() {
 }
 
 Game.Multi.prototype._close = function(e) {
+	this._keyboard.setControl(null);
+	this._player.setIdle(true);
 	this.start();
 }
 
@@ -195,6 +197,10 @@ Game.Multi.prototype._mergeShip = function(ship, data) {
 			*/
 			phys[p] = data.phys[p]; 
 		}
+	}
+
+	if (data.hp) {
+		ship.setRemoteHP(data.hp);
 	}
 	
 	if (diff) { console.info("Total position diff " + diff); }
