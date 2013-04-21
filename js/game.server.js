@@ -158,11 +158,11 @@ Game.Server.prototype.onmessage = function(client, data) {
 		break;
 	}
 	
-	/* forward message to all other clients */
-	for (var i=0;i<this._clients.length;i++) {
-		var id = this._clients[i];
-		this._ws.send(id, data);
-	}
+	// /* forward message to all other clients */
+	// for (var i=0;i<this._clients.length;i++) {
+	// 	var id = this._clients[i];
+	// 	this._ws.send(id, data);
+	// }
 }
 
 Game.Server.prototype.onidle = function() {
