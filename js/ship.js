@@ -323,10 +323,19 @@ Ship.prototype.showLabel = function(text, options) {
 
 Ship.prototype._tickWeapons = function() {
 
-	// var currentDate = new Date();
+	var currentDate = new Date();
 
 	if (this._alive && this._control.fire) { /* fire */
 
+		if (currentDate - this._weaponStartTime < 1 * 1000) {
+			this._weapon._delay = 100;
+		}
+		else if (currentDate - this._weaponStartTime < 4 * 1000) {
+			this._weapon._delay = 200;
+		}
+		else {
+			this._weapon._delay = 300;
+		}
 		// if (currentDate - this._weaponStartTime > 2 * 1000) { return; }
 
 		if (this._weapon.isReady()) {
@@ -340,7 +349,7 @@ Ship.prototype._tickWeapons = function() {
 		}
 	}
 	else {
-		// this._weaponStartTime = currentDate;
+		this._weaponStartTime = currentDate;
 	}
 
 	
