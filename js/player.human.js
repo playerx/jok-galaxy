@@ -28,7 +28,8 @@ Player.Human.prototype.setIdle = function(idle) {
 		this._idleNode.style.left = Math.round((parent.offsetWidth-this._idleNode.offsetWidth)/2) + "px";
 		this._idleNode.style.top = Math.round((parent.offsetHeight-this._idleNode.offsetHeight)/2) + "px";
 	} else {
-		this._idleNode.parentNode.removeChild(this._idleNode);
+		if (this._idleNode.parentNode != null)
+			this._idleNode.parentNode.removeChild(this._idleNode);
 	}
 }
 

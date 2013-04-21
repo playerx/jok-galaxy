@@ -172,8 +172,6 @@ Game.Server.prototype.onidle = function() {
 
 	this._engine.tick();
 
-	return;
-
 	var ts = Date.now();
 	
 	if (ts - this._ts.idle > this._options.idle) { /* send sync info to all clients */

@@ -43,7 +43,6 @@ Game.Multi.prototype._open = function(e) {
 }
 
 Game.Multi.prototype._message = function(e) {
-	console.log(new Date(), e.data)
 
 	var data = JSON.parse(e.data);
 	var currentPlayer = this._player;
@@ -155,12 +154,18 @@ Game.Multi.prototype._message = function(e) {
 	}
 }
 
-Game.Multi.prototype._send = function(type, data) {
+Game.Multi.prototype._send = function(type, data, preventSimluation) {
 	var obj = {
 		type: type,
 		data: data
 	}
-	this._socket.send(JSON.stringify(obj));
+
+	var objString = JSON.stringify(obj);
+
+	this._socket.send(objString);
+	if (preventSimluation) return;
+	
+	this._message({ data: objString });
 }
 
 Game.Multi.prototype._keyboardChange = function(e) {
@@ -221,7 +226,7 @@ Game.Multi.prototype._shipCreate = function(e) {
 			phys: e.target.getPhys()
 		}
 		
-		this._send(Game.MSG_CREATE_SHIP, data);
+		this._send(Game.MSG_CREATE_SHIP, data, 1);
 	}
 }
 
