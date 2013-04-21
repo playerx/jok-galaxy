@@ -43,6 +43,8 @@ Game.Multi.prototype._open = function(e) {
 }
 
 Game.Multi.prototype._message = function(e) {
+	console.log(new Date(), e.data)
+
 	var data = JSON.parse(e.data);
 	var currentPlayer = this._player;
 	var currentDate = new Date();
