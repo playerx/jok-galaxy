@@ -26,6 +26,8 @@ var ws = {
 		if (!(id in clients)) { return; }
         if (!clients[id].socket.writable) { return; }
 
+        // console.log('sending', id, data)
+
 		clients[id].send(data);
 	},
 	setDebug: function() {
