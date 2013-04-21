@@ -14,7 +14,7 @@ TestClient.prototype.start = function() {
     this._socket.on('message', this._message.bind(this))
     this._socket.on('close', this._close.bind(this))
 
-    this._socket.connect('ws://localhost:9003/');
+    this._socket.connect('ws://37.153.97.80:9003/');
 }
 
 TestClient.prototype._open = function(connection) {
