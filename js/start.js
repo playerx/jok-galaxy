@@ -82,7 +82,7 @@ var ui = {
 		var usernick = $.cookie('usernick') || '';
 		
 
-		var url = "ws://" + location.hostname + ':9003';
+		var url = "ws://" + location.hostname + ':' + location.port;
 
 		game = new Game.Multi(usernick, ship, url);
 		game.start();

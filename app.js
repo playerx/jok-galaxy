@@ -1,9 +1,9 @@
 
-process.env.ENV = 'production';
+// process.env.ENV = 'production';
 
 var Game = require('./jsfiles-loader').Game
 
-
+var port = process.env.PORT || 9003;
 
 /* Wrapper instance to get Game.Server */
 var ws = {
@@ -54,8 +54,8 @@ server = require('http').createServer(function(req, res) {
         file.serve(req, res);
     })
 });
-server.listen(9003, function() {
-    console.log((new Date()) + ' Server is listening on port 9003');
+server.listen(port, function() {
+    console.log((new Date()) + ' Server is listening on port '+port);
 });
 
 wsServer = new WebSocketServer({
