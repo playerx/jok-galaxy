@@ -290,7 +290,7 @@ Ship.prototype.damage = function(weapon) {
 
 	if (this._remotehp <= 0)
 		this._remotehp = 10; // თუ რამეა, სერვერიდან მოვა აფეთქება
-	
+
 	
 	var labelPos = this._sprite.position.clone();
 	labelPos[1] -= this._sprite.size[1]/2;
@@ -322,15 +322,27 @@ Ship.prototype.showLabel = function(text, options) {
 }
 
 Ship.prototype._tickWeapons = function() {
-	if (this._alive && this._control.fire && this._weapon.isReady()) { /* fire */
-		var dist = this._sprite.size[0]/3;
-		
-		var pos = [
-			this._phys.position[0] + dist * Math.cos(this._phys.orientation),
-			this._phys.position[1] + dist * Math.sin(this._phys.orientation)
-		];
-		this._weapon.fire(pos);
+
+	// var currentDate = new Date();
+
+	if (this._alive && this._control.fire) { /* fire */
+
+		// if (currentDate - this._weaponStartTime > 2 * 1000) { return; }
+
+		if (this._weapon.isReady()) {
+			var dist = this._sprite.size[0]/3;
+			
+			var pos = [
+				this._phys.position[0] + dist * Math.cos(this._phys.orientation),
+				this._phys.position[1] + dist * Math.sin(this._phys.orientation)
+			];
+			this._weapon.fire(pos);
+		}
 	}
+	else {
+		// this._weaponStartTime = currentDate;
+	}
+
 	
 	return false;
 }

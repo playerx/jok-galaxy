@@ -1,5 +1,5 @@
 
-var Game = require('./jsfiles-loader')
+var Game = require('./jsfiles-loader').Game
 var WebSocketClient = require('websocket').client
 
 
@@ -88,7 +88,7 @@ setInterval(function() {
         createTestStuff();
     };
 
-}, 600)
+}, 1)
 
 var createTestStuff = function() {
     var client = new TestClient();
@@ -97,16 +97,14 @@ var createTestStuff = function() {
     console.log('connecting...', activeClients.length)
 
 
-    var tt = setInterval(function() {
-        clearInterval(tt);
-        if (!client._close()) return;
+    // var tt = setInterval(function() {
+    //     clearInterval(tt);
+    //     if (!client._close()) return;
 
-        activeClients.splice(activeClients.indexOf(client), 1);
+    //     activeClients.splice(activeClients.indexOf(client), 1);
 
-        console.log('disconnecting...', activeClients.length);
-    }, 600)
-
-
+    //     console.log('disconnecting...', activeClients.length);
+    // }, 200)
 }
 
 

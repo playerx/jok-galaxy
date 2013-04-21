@@ -1,7 +1,7 @@
 
 process.env.ENV = 'production';
 
-var Game = require('./jsfiles-loader')
+var Game = require('./jsfiles-loader').Game
 
 
 
@@ -24,6 +24,7 @@ var ws = {
 	},
 	send: function(id, data) {
 		if (!(id in clients)) { return; }
+        if (!clients[id].socket.writable) { return; }
 
 		clients[id].send(data);
 	},
@@ -110,10 +111,10 @@ wsServer.on('request', function(request) {
 
         	ws.gameServer.onmessage(connection.clientid, message.utf8Data);
         }
-        else if (message.type === 'binary') {
-            console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
-            connection.sendBytes(message.binaryData);
-        }
+        // else if (message.type === 'binary') {
+        //     console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
+        //     connection.sendBytes(message.binaryData);
+        // }
 
     });
     connection.on('close', function(reasonCode, description) {
@@ -122,14 +123,15 @@ wsServer.on('request', function(request) {
     	}
 
         if (process.env.ENV != 'production') {
-            // console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+            console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
         }
     	ws.gameServer.ondisconnect(connection.clientid, '', '');
     });
     connection.on('error', function(err) {
-        console.log((new Date()) + ' error: ' + err);
+        console.log('error: [' + connection.clientid + '] ' + err);
     });
 });
+
 
 
 

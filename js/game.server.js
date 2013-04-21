@@ -25,7 +25,7 @@ Game.Server.prototype.init = function(ws, options) {
 	
 	this._ws.addApplication(this);
 
-	setInterval(this.cleanup.bind(this), 1000);
+	setInterval(this.cleanup.bind(this), 100);
 }
 
 Game.Server.prototype.cleanup = function() {
@@ -72,8 +72,7 @@ Game.Server.prototype.onconnect = function(client, headers) {
 Game.Server.prototype.ondisconnect = function(client, code, message) {
 	var index = this._clients.indexOf(client);
 	if (index == -1) { 
-		// this._debug("Disconnecting non-existant client " + client);
-		console.log("Disconnecting non-existant client " + client);
+		this._debug("Disconnecting non-existant client " + client);
 		return;
 	}
 
@@ -81,8 +80,7 @@ Game.Server.prototype.ondisconnect = function(client, code, message) {
 	var player = this._clientPlayers[index];
 	this._clientPlayers.splice(index, 1);
 	if (!player) { 
-		// this._debug("Disconnecting client with undefined player " + client);
-		console.log("Disconnecting non-existant undefined player " + client);
+		this._debug("Disconnecting client with undefined player " + client);
 		return; 
 	}
 	
@@ -90,6 +88,7 @@ Game.Server.prototype.ondisconnect = function(client, code, message) {
 }
 
 Game.Server.prototype.onmessage = function(client, data) {
+
 	var parsed = JSON.parse(data);
 	switch (parsed.type) {
 		case Game.MSG_CREATE_PLAYER:
@@ -187,7 +186,7 @@ Game.Server.prototype.onidle = function() {
 
 
 		// ყველასთვის საკუთარი სტეიტის გაგზავნა
-		for (var i=0;i<this._clients.length;i++) {
+		for (var i=0; i<this._clients.length; i++) {
 
 			// var ship = this._players[id].getShip();
 			
@@ -195,13 +194,18 @@ Game.Server.prototype.onidle = function() {
 			// 	phys: ship.getPhys(),
 			// 	control: ship.getControl()
 			// }
-
-			this._ws.send(this._clients[i], data);
+			try {
+				this._ws.send(this._clients[i], data);
+			}
+			catch(err) {
+				console.log('err omg ', err.message)
+			}
 		}
 
 		data = null;
 
 	}
+
 
 	if (process.env.ENV == "production") return;
 	
@@ -215,6 +219,7 @@ Game.Server.prototype.onidle = function() {
 		}
 		this._debug("[stats] " + players + " players, " + ships + " ships");
 	}
+
 }
 
 Game.Server.prototype._getState = function() {

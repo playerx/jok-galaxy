@@ -26,6 +26,7 @@ var totalScript = '';
 for (var i=0;i<scripts.length;i++) {
 
     if (scripts[i].indexOf('jquery.min.js') > 0 ||
+    	scripts[i].indexOf('jquery.cookie.js') > 0 ||
         scripts[i].indexOf('preloadjs-0.2.0.js') > 0 ||
         scripts[i].indexOf('setup.js') > 0) continue;
 
@@ -44,4 +45,5 @@ for (var i=0;i<scripts.length;i++) {
 HAF.Engine.prototype.draw = function() { }
 
 
-module.exports = Game;
+exports.Game = Game;
+exports.Player = Player;

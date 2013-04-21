@@ -95,6 +95,26 @@ $(function() {
 
 	/* Authorization */
 	var sid = $.cookie('sid');
+
+	if (!sid) {
+		console.log(window.location.search)
+		if (!window.location.search) {
+			redirectToGetSID();
+			return;
+		}
+
+		var query = window.location.search.replace('?', '').split('=');
+		console.log(query)
+		if (query.length >= 2 && query[0] == 'sid') {
+			sid = query[1];
+			$.cookie('sid', sid, { expires: 7 });
+		}
+		else {
+			redirectToGetSID();
+			return;
+		}
+	}
+
 	if (!sid) {
 		window.location.assign(jok.config.authorizationUrl);
 		return;
