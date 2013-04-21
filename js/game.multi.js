@@ -23,8 +23,13 @@ Game.Multi.prototype.start = function() {
 
 Game.Multi.prototype._close = function(e) {
 	this._keyboard.setControl(null);
-	this._player.setIdle(true);
-	this.start();
+	if (this._player._ship)
+		this._player._ship.die();
+
+	var _this = this;
+	setTimeout(function() {
+		_this.start();
+	}, 2000)
 }
 
 Game.Multi.prototype._open = function(e) {
@@ -164,7 +169,7 @@ Game.Multi.prototype._send = function(type, data, preventSimluation) {
 
 	this._socket.send(objString);
 	if (preventSimluation) return;
-	
+
 	this._message({ data: objString });
 }
 
