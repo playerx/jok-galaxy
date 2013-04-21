@@ -128,7 +128,7 @@ wsServer.on('request', function(request) {
     	ws.gameServer.ondisconnect(connection.clientid, '', '');
     });
     connection.on('error', function(err) {
-        console.log('error: [' + connection.clientid + '] ' + err);
+        // console.log('error: [' + connection.clientid + '] ' + err);
     });
 });
 

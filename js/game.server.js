@@ -89,8 +89,6 @@ Game.Server.prototype.ondisconnect = function(client, code, message) {
 
 Game.Server.prototype.onmessage = function(client, data) {
 
-	return;
-
 	var parsed = JSON.parse(data);
 	switch (parsed.type) {
 		case Game.MSG_CREATE_PLAYER:
