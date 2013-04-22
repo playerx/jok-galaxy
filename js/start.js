@@ -99,7 +99,7 @@ $(function() {
 	if (!sid) {
 		console.log(window.location.search)
 		if (!window.location.search) {
-			redirectToGetSID();
+			window.location.assign(jok.config.authorizationUrl);
 			return;
 		}
 
@@ -110,7 +110,7 @@ $(function() {
 			$.cookie('sid', sid, { expires: 7 });
 		}
 		else {
-			redirectToGetSID();
+			window.location.assign(jok.config.authorizationUrl);
 			return;
 		}
 	}
