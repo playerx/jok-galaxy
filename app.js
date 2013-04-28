@@ -10,6 +10,9 @@ var port = process.env.PORT || 9003;
 
 var $ = {
     get: function(url, cb) {
+
+        if (!cb) cb = function() {};
+
         var options = {
           hostname: 'api.jok.ge',
           port: 80,
@@ -25,7 +28,7 @@ var $ = {
             res.on('data', function (chunk) {
                 data += chunk;
             });
-            res.on('data', function (chunk) {
+            res.on('end', function (chunk) {
                 try{
                     cb(JSON.parse(data));
                 }
