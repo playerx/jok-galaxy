@@ -48,7 +48,7 @@ var ws = {
 		if (ws.isInitialized) return;
 
 
-		new Game.Server(ws, { idle: 10*1000 }).start();
+		new Game.Server(ws).start();
 	},
 	addApplication: function(gameServer) {
 		ws.gameServer = gameServer;
