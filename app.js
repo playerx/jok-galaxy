@@ -2,10 +2,44 @@
 // process.env.ENV = 'production';
 
 var Game = require('./jsfiles-loader').Game
-var $ = require('jquery')
 var urlParser = require('url');
+var http = require('http');
 
 var port = process.env.PORT || 9003;
+
+
+var $ = {
+    get: function(url, cb) {
+        var options = {
+          hostname: 'api.jok.ge',
+          port: 80,
+          path: url,
+          method: 'GET'
+        };
+
+        var req = http.request(options, function(res) {
+
+            var data = '';
+
+            res.setEncoding('utf8');
+            res.on('data', function (chunk) {
+                data += chunk;
+            });
+            res.on('data', function (chunk) {
+                try{
+                    cb(JSON.parse(data));
+                }
+                catch(err) { cb(); }
+            });
+        });
+
+        req.on('error', function(e) {
+          cb();
+        });
+
+        req.end();
+    }
+}
 
 /* Wrapper instance to get Game.Server */
 var ws = {
@@ -40,7 +74,7 @@ var ws = {
         if (!(killer_id in clients)) { return; }
         var userid = clients[killer_id].userid;
 
-        $.get('http://api.jok.ge/game/' + userid + '/GalaxyRatingAdd?secret=sercet');
+        $.get('/game/' + userid + '/GalaxyRatingAdd?secret=sercet');
     }
 }
 ws.initialize();
@@ -109,7 +143,7 @@ wsServer.on('request', function(request) {
         return;
     }
 
-    $.get('http://api.jok.ge/user/' + sid + '/getinfo?ipaddress=' + request.remoteAddress, function(result) {
+    $.get('/user/' + sid + '/getinfo?ipaddress=' + request.remoteAddress, function(result) {
         if (!result || !result.IsSuccess) {
             request.reject();
             return;
