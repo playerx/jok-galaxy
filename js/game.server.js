@@ -52,6 +52,8 @@ Game.Server.prototype.onconnect = function(client, headers) {
 			shipOptions: player.getShipOptions()
 		}
 	}
+
+
 	var data = {
 		type: Game.MSG_CREATE_PLAYER,
 		data: playerData
@@ -273,10 +275,24 @@ Game.Server.prototype._shipDeath = function(e) {
 	}
 	if (e.data.enemy) { data.data.enemy = e.data.enemy.getId(); }
 
+	var deadShip, killerShip;
+
+
 	var str = JSON.stringify(data);
 	for (var i=0;i<this._clients.length;i++) {
 		this._ws.send(this._clients[i], str);
+
+		if (this._clientPlayers[i]._id == data.data.target)
+			deadShip = this._clients[i];
+
+		if (this._clientPlayers[i]._id == data.data.enemy)
+			killerShip = this._clients[i];
 	}
+
+	// var deadShip = this._clients.indexOf(data.data.target);
+	// var killerShip = this._clients.indexOf(data.data.enemy);
+	if (e.data.enemy)
+		this._ws.updateScore(deadShip, killerShip);
 }
 
 Game.Server.prototype._removePlayer = function(id) {

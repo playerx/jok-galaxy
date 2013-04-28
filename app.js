@@ -2,6 +2,8 @@
 // process.env.ENV = 'production';
 
 var Game = require('./jsfiles-loader').Game
+var $ = require('jquery')
+var urlParser = require('url');
 
 var port = process.env.PORT || 9003;
 
@@ -12,7 +14,7 @@ var ws = {
 		if (ws.isInitialized) return;
 
 
-		new Game.Server(ws).start();
+		new Game.Server(ws, { idle: 10*1000 }).start();
 	},
 	addApplication: function(gameServer) {
 		ws.gameServer = gameServer;
@@ -32,11 +34,16 @@ var ws = {
 	},
 	setDebug: function() {
 
-	}
+	},
+    updateScore: function(dead_id, killer_id) {
+
+        if (!(killer_id in clients)) { return; }
+        var userid = clients[killer_id].userid;
+
+        $.get('http://api.jok.ge/game/' + userid + '/GalaxyRatingAdd?secret=sercet');
+    }
 }
 ws.initialize();
-
-
 
 
 /* Web Server */
@@ -85,53 +92,81 @@ wsServer.on('request', function(request) {
     }
 
     if (!ws.isInitialized) {
+        request.reject();
     	console.log('ws not initialized yet!');
     	return;
     }
 
-    var connection = request.accept(null, request.origin);
+    var sid;
 
-    if (process.env.ENV != 'production') {
-        // console.log(JSON.stringify(request.requestedProtocols));
-        // console.log(JSON.stringify(request.requestedExtensions));
-        // console.log((new Date()) + ' Connection accepted.');
+    try {
+        sid = urlParser.parse(request.httpRequest.url, true).query.sid;
+    }
+    catch(err) { }
+
+    if (!sid) {
+        request.reject();
+        return;
     }
 
-    connection.clientid = Math.random().toString().replace("0.", "");
-    clients[connection.clientid] = connection;
-
-    ws.gameServer.onconnect(connection.clientid, request.httpRequest.headers);
-
-
-    connection.on('message', function(message) {
-        if (message.type === 'utf8') {
-            if (process.env.ENV != 'production') {
-                console.log('Received Message: ' + message.utf8Data);
-            }
-
-            // connection.sendUTF(message.utf8Data);
-
-        	ws.gameServer.onmessage(connection.clientid, message.utf8Data);
+    $.get('http://api.jok.ge/user/' + sid + '/getinfo?ipaddress=' + request.remoteAddress, function(result) {
+        if (!result || !result.IsSuccess) {
+            request.reject();
+            return;
         }
-        // else if (message.type === 'binary') {
-        //     console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
-        //     connection.sendBytes(message.binaryData);
-        // }
 
-    });
-    connection.on('close', function(reasonCode, description) {
-    	if (connection.clientid in clients) {
-    		delete clients[connection.clientid];
-    	}
+        var connection = request.accept(null, request.origin);
 
         if (process.env.ENV != 'production') {
-            console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+            // console.log(JSON.stringify(request.requestedProtocols));
+            // console.log(JSON.stringify(request.requestedExtensions));
+            // console.log((new Date()) + ' Connection accepted.');
         }
-    	ws.gameServer.ondisconnect(connection.clientid, '', '');
-    });
-    connection.on('error', function(err) {
-        // console.log('error: [' + connection.clientid + '] ' + err);
-    });
+
+        var isDisconnected = false;
+
+
+
+        connection.userid = result.UserID;
+        connection.clientid = Math.random().toString().replace("0.", "");
+        clients[connection.clientid] = connection;
+
+        ws.gameServer.onconnect(connection.clientid, request.httpRequest.headers);
+
+
+        connection.on('message', function(message) {
+            if (message.type === 'utf8') {
+                if (process.env.ENV != 'production') {
+                    console.log('Received Message: ' + message.utf8Data);
+                }
+
+                // connection.sendUTF(message.utf8Data);
+
+            	ws.gameServer.onmessage(connection.clientid, message.utf8Data);
+            }
+            // else if (message.type === 'binary') {
+            //     console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
+            //     connection.sendBytes(message.binaryData);
+            // }
+
+        });
+        connection.on('close', function(reasonCode, description) {
+            isDisconnected = true;
+
+        	if (connection.clientid in clients) {
+        		delete clients[connection.clientid];
+        	}
+
+            if (process.env.ENV != 'production') {
+                console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
+            }
+        	ws.gameServer.ondisconnect(connection.clientid, '', '');
+        });
+        connection.on('error', function(err) {
+            isDisconnected = true;
+            // console.log('error: [' + connection.clientid + '] ' + err);
+        });
+    })
 });
 
 
