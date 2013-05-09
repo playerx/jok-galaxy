@@ -6,9 +6,9 @@
       "node": "0.8.11"
    },
    "dependencies": {
-      "http-proxy": ">=0.8.3",
-      "socket.io": "*",
-      "node-static": "*"
+      "express": "3.2.4",
+      "ejs": "0.8.4",
+      "socket.io": "0.9.4"
    },
    "scripts": {
       "start": "node app2"
