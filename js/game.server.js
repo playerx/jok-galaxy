@@ -58,7 +58,7 @@ Game.Server.prototype.onconnect = function(client, headers) {
 		type: Game.MSG_CREATE_PLAYER,
 		data: playerData
 	}
-	data = JSON.stringify(data);
+	// data = JSON.stringify(data);
 	this._ws.send(client, data);
 
 	/* send CREATE_SHIP */
@@ -67,7 +67,7 @@ Game.Server.prototype.onconnect = function(client, headers) {
 		type: Game.MSG_CREATE_SHIP,
 		data: state
 	}
-	data = JSON.stringify(data);
+	// data = JSON.stringify(data);
 	this._ws.send(client, data);
 }
 
@@ -91,7 +91,7 @@ Game.Server.prototype.ondisconnect = function(client, code, message) {
 
 Game.Server.prototype.onmessage = function(client, data) {
 
-	var parsed = JSON.parse(data);
+	var parsed = data; //JSON.parse(data);
 	switch (parsed.type) {
 		case Game.MSG_CREATE_PLAYER:
 			for (var id in parsed.data) {
@@ -187,7 +187,7 @@ Game.Server.prototype.onidle = function() {
 			type: Game.MSG_SYNC,
 			data: state
 		}
-		data = JSON.stringify(data);
+		// data = JSON.stringify(data);
 
 
 		// ყველასთვის საკუთარი სტეიტის გაგზავნა
@@ -278,7 +278,7 @@ Game.Server.prototype._shipDeath = function(e) {
 	var deadShip, killerShip;
 
 
-	var str = JSON.stringify(data);
+	var str = data; //JSON.stringify(data);
 	for (var i=0;i<this._clients.length;i++) {
 		this._ws.send(this._clients[i], str);
 
@@ -309,7 +309,7 @@ Game.Server.prototype._removePlayer = function(id) {
 		type: Game.MSG_DESTROY_PLAYER,
 		data: player.getId()
 	}
-	data = JSON.stringify(data);
+	// data = JSON.stringify(data);
 	
 	for (var i=0;i<this._clients.length;i++) {
 		var client = this._clients[i];

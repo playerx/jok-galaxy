@@ -1,9 +1,9 @@
 {
    "name": "jok-galaxy",
-   "author": "Jok ltd.",
+   "author": "Jok.ge",
    "version": "0.1.0",
    "engines": {
-      "node": ">=0.8.11"
+      "node": "0.8.11"
    },
    "dependencies": {
       "http-proxy": ">=0.8.3",

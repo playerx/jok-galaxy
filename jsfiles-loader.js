@@ -18,7 +18,7 @@ var createjs = {};
 global.setTimeout = function() {};
 
 /* read all javascript files */
-var html = fs.readFileSync(__dirname + '/index.html', 'utf-8');
+var html = fs.readFileSync(__dirname + '/views/index.ejs', 'utf-8');
 
 
 var scripts = html.match(/js\/.*?\.js/g);
@@ -28,6 +28,7 @@ for (var i=0;i<scripts.length;i++) {
     if (scripts[i].indexOf('jquery.min.js') > 0 ||
     	scripts[i].indexOf('jquery.cookie.js') > 0 ||
         scripts[i].indexOf('preloadjs-0.2.0.js') > 0 ||
+        scripts[i].indexOf('socket.io.js') > 0 ||
         scripts[i].indexOf('setup.js') > 0) continue;
 
 	console.log('loading: ' + scripts[i]);
