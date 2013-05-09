@@ -11,6 +11,6 @@
       "node-static": "*"
    },
    "scripts": {
-      "start": "node app"
+      "start": "node app2"
    }
 }
