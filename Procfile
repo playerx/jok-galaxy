@@ -1,1 +1,1 @@
-web=1
+web: node app2.js
