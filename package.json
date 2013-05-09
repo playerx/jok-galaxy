@@ -7,7 +7,7 @@
    },
    "dependencies": {
       "http-proxy": ">=0.8.3",
-      "websocket": "*",
+      "socket.io": "*",
       "node-static": "*"
    },
    "scripts": {
