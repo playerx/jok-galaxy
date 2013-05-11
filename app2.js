@@ -8,6 +8,9 @@
  */
 
 
+process.env.ENV = 'production';
+
+
 /* [Modules Import] */
 var http = require('http')
   , express = require('express')
@@ -92,39 +95,6 @@ app.configure(function(){
 
             callback(null, true);
         });
-        // try {
-        //     var ipaddress = handshakeData.address.address;
-        //     var sid = handshakeData.query.sid;
-            
-        //     if (!sid) { callback(null, false);  return; }
-            
-        //     if (sid.length != 36) {
-        //         callback(null, false);
-        //         return;
-        //     }
-            
-            
-        //     handshakeData.sid = sid;
-            
-        //     process.stats.processingLoginsCount++;
-            
-        //     var gameid = handshakeData.query.gameid || 0;
-            
-        //     db.checkLogin(sid, ipaddress, gameid, function(isSuccess, userid, isAdmin) {
-                
-        //         process.stats.processingLoginsCount--;
-                
-        //         handshakeData.isAdmin = isAdmin;
-                
-        //         if (isSuccess)
-        //             handshakeData.userid = userid;
-                
-        //         callback(null, isSuccess);
-        //     });
-        // }
-        // catch (err) {
-        //     console.log(err);
-        // }
     });
 
     io.set('transports', [
@@ -160,7 +130,7 @@ app.get('/', function(req, res) {
 
 
 
-var clients = [];
+var clients = {};
 
 /* [Service] */
 io.on('connection', function(socket){
@@ -182,6 +152,8 @@ io.on('connection', function(socket){
     });
     
     socket.on('disconnect', function() {
+        console.log('disconnect');
+
         if (clientid in clients) {
             delete clients[clientid];
         }
