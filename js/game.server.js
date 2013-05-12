@@ -282,11 +282,13 @@ Game.Server.prototype._shipDeath = function(e) {
 	for (var i=0;i<this._clients.length;i++) {
 		this._ws.send(this._clients[i], str);
 
-		if (this._clientPlayers[i]._id == data.data.target)
-			deadShip = this._clients[i];
+		if (this._clientPlayers[i]) {
+			if (this._clientPlayers[i]._id == data.data.target)
+				deadShip = this._clients[i];
 
-		if (this._clientPlayers[i]._id == data.data.enemy)
-			killerShip = this._clients[i];
+			if (this._clientPlayers[i]._id == data.data.enemy)
+				killerShip = this._clients[i];
+		}
 	}
 
 	// var deadShip = this._clients.indexOf(data.data.target);
