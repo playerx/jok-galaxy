@@ -72,8 +72,8 @@ Game.Multi.prototype._message = function(e) {
 				}
 
 				if (data.type == Game.MSG_SYNC) {
-					if ((currentPlayer == player) && 
-					    (currentPlayer.lastUpdateTime && currentDate - currentPlayer.lastUpdateTime < 10000)) {
+					if ((currentPlayer == player))// && 
+					    //(currentPlayer.lastUpdateTime && currentDate - currentPlayer.lastUpdateTime < 10000)) {
 						continue;
 					}
 
@@ -239,5 +239,8 @@ Game.Multi.prototype._shipCreate = function(e) {
 Game.Multi.prototype._shipDeath = function(e) {
 	if (e.target.getPlayer() == this._player) {
 		this._keyboard.setControl(null);
+		this._control = {
+			torque: {}
+		}
 	}
 }
