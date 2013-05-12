@@ -72,8 +72,9 @@ Game.Multi.prototype._message = function(e) {
 				}
 
 				if (data.type == Game.MSG_SYNC) {
-					if ((currentPlayer == player))// && 
-					    //(currentPlayer.lastUpdateTime && currentDate - currentPlayer.lastUpdateTime < 10000)) {
+					if ((currentPlayer == player))
+					// && (currentPlayer.lastUpdateTime && currentDate - currentPlayer.lastUpdateTime < 10000)) 
+					{
 						continue;
 					}
 
