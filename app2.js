@@ -140,19 +140,16 @@ io.on('connection', function(socket){
 
     clients[clientid] = socket;
 
-    ws.gameServer.onconnect(clientid, '');
+    ws.gameServer.onconnect(clientid);
 
     console.log('connected!', userid, clientid);
 
-
-
     socket.on('data_message', function(message) {
-
         ws.gameServer.onmessage(clientid, message);
     });
     
     socket.on('disconnect', function() {
-        console.log('disconnect');
+        console.log('disconnected!');
 
         if (clientid in clients) {
             delete clients[clientid];
@@ -182,41 +179,6 @@ var http = require('http');
 var port = process.env.PORT || 9003;
 
 
-var $ = {
-    get: function(url, cb) {
-
-        if (!cb) cb = function() {};
-
-        var options = {
-          hostname: 'api.jok.ge',
-          port: 80,
-          path: url,
-          method: 'GET'
-        };
-
-        var req = http.request(options, function(res) {
-
-            var data = '';
-
-            res.setEncoding('utf8');
-            res.on('data', function (chunk) {
-                data += chunk;
-            });
-            res.on('end', function (chunk) {
-                try{
-                    cb(JSON.parse(data));
-                }
-                catch(err) { cb(); }
-            });
-        });
-
-        req.on('error', function(e) {
-          cb();
-        });
-
-        req.end();
-    }
-}
 
 /* Wrapper instance to get Game.Server */
 var ws = {
@@ -241,6 +203,10 @@ var ws = {
         // console.log('sending', id, data)
 
         clients[id].emit('data_message', data);
+    },
+    sendToAll: function(data) {
+
+        io.sockets.emit('data_message', data);
     },
     setDebug: function() {
 

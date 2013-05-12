@@ -163,16 +163,19 @@ Game.Server.prototype.onmessage = function(client, data) {
 	if (parsed.type == Game.MSG_CHANGE) { return; }
 
 
-	/* forward message to all other clients */
-	for (var i=0;i<this._clients.length;i++) {
-		var id = this._clients[i];
-		this._ws.send(id, data);
-	}
+	// /* forward message to all other clients */
+	// for (var i=0;i<this._clients.length;i++) {
+	// 	var id = this._clients[i];
+	// 	this._ws.send(id, data);
+	// }
+	this._ws.sendToAll(data)
 }
 
 Game.Server.prototype.onidle = function() {
 
 	this._engine.tick();
+
+	return;
 
 	var ts = Date.now();
 	
@@ -282,11 +285,13 @@ Game.Server.prototype._shipDeath = function(e) {
 	for (var i=0;i<this._clients.length;i++) {
 		this._ws.send(this._clients[i], str);
 
-		if (this._clientPlayers[i]._id == data.data.target)
-			deadShip = this._clients[i];
+		if (this._clientPlayers[i]) {
+			if (this._clientPlayers[i]._id == data.data.target)
+				deadShip = this._clients[i];
 
-		if (this._clientPlayers[i]._id == data.data.enemy)
-			killerShip = this._clients[i];
+			if (this._clientPlayers[i]._id == data.data.enemy)
+				killerShip = this._clients[i];
+		}
 	}
 
 	// var deadShip = this._clients.indexOf(data.data.target);
