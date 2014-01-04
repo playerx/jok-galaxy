@@ -146,7 +146,7 @@ wsServer.on('request', function(request) {
         return;
     }
 
-    $.get('/user/' + sid + '/getinfo?ipaddress=' + request.remoteAddress, function(result) {
+    $.get('/user/' + sid + '/getinfo?gameid=10&ipaddress=' + request.remoteAddress, function(result) {
         if (!result || !result.IsSuccess) {
             request.reject();
             return;

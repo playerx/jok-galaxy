@@ -157,7 +157,7 @@ var ui = {
 
 
 $('.jokge').live('click', function() {
-	window.location.assign('http://jok.ge');
+	window.location.assign('http://jok.io');
 });
 
 $(function() {
